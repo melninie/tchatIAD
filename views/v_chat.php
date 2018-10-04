@@ -56,66 +56,9 @@
                     <hr color="white">
                     <h3 class="text-center">Membres</h3>
 
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 1</b> <small>(Dernier message : 22h30)</small>
-                    </p>
-                    <p>
-                        <b>Tst Usr 100</b> <small>(Dernier message : 22h30)</small>
-                    </p>
+                    <ul id="users" class="list-group">
+                        <!-- Dislay users -->
+                    </ul>
                 </span>
             </div>
         </span>
@@ -141,74 +84,25 @@
 
 </div>
 
+<?php
+    include '../ajax/get_messages.php';
+    include '../ajax/get_users.php';
+    include '../ajax/send_message.php';
+?>
+
 <script type="text/javascript">
     $( document ).ready(function() {
         getMessages();
-
+        getUsers();
+        setInterval (function sendRequest(){
+            $("#list_messages").empty();
+            getMessages();
+        },10000);
+        setInterval (function sendRequest(){
+            $("#users").empty();
+            getUsers();
+        },15000);
     });
-
-    function send() {
-        $('#send_message').prop("disabled",true); // disable button while send message
-
-        var url = '../controllers/c_send_message.php';
-        var message = $("#message").val();
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: { message: message },
-            dataType : 'json'
-        }).done(function(data) {
-            $("#message").val(''); // clear input value
-            $('#send_message').prop("disabled",false); // enable button again
-        });
-    }
-
-    function getMessages() {
-        var url = '../controllers/c_get_messages.php';
-        $.ajax({
-            type: "POST",
-            url: url,
-            dataType : 'json'
-        }).done(function(data) {
-            console.log( "Data Saved: ",data );
-            displayMessages(data.messages, function(){
-                var h1, h2;
-                h1 = $('#span_message').height();
-                h2 = jQuery(window).height();
-                $('#div_membres').height(h2-h1);
-                $('#div_messages').height(h2-h1);
-                $('#div_messages').animate(
-                    {scrollTop: $('#div_messages').get(0).scrollHeight}, 10
-                );
-            });
-        });
-    }
-
-    function displayMessages(messages, callback){
-        var previous_date = '';
-
-        $(messages).each(function(i, item) {
-            var date_message = getDateMessage(item);
-            if(previous_date != date_message) {
-                $( "#list_messages" ).append('<div class="hr">'+date_message+'</div>');
-                previous_date = date_message + '';
-            }
-
-            // if connected user sent this message
-            var classe = "alert alert-secondary";
-            if(item.login == "<?php echo $_SESSION['login'] ?>") {
-                classe = "alert alert-primary";
-
-            }
-            $( "#list_messages" ).append('' +
-                '<div class="'+classe+'">' +
-                    '<b>'+item.login+'</b> ('+getHeureMessage(item)+') :<br>' +
-                    item.content +
-                '</div>'
-            );
-            callback();
-        });
-    }
 
     function getDateMessage(message) {
         return new Date(message.date).getDate() + '/' +

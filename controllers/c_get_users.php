@@ -7,10 +7,10 @@ if (empty($_SESSION) || !isset($_SESSION['login']) || empty($_SESSION['login']) 
     header('location:../index.php');
 }
 
-include ('../models/m_message.php');
+include ('../models/m_user.php');
 
-if ($messages = getMessages()) {
-    echo json_encode(array('return' => 'done', 'messages' => $messages));
+if ($users = getUsers()) {
+    echo json_encode(array('return' => 'done', 'users' => $users));
 }
 else {
     echo json_encode(array('return' => 'error'));
