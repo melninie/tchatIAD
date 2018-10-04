@@ -20,3 +20,16 @@ function sendMessage($message)
     $req->closeCursor();
     return ($req->rowCount());
 }
+
+/*
+ * Get all messages in bdd
+ */
+function getMessages()
+{
+    global $bdd;
+    $req = $bdd->prepare("SELECT m.content, m.date, u.login FROM message m LEFT JOIN user u ON m.sender = u.id ORDER BY date ASC");
+    $req->execute();
+    $results = $req->fetchAll(PDO::FETCH_ASSOC);
+    $req->closeCursor();
+    return ($results);
+}
