@@ -134,9 +134,9 @@
             <span class="col-md-12 col-sm-12 col-lg-12 fixed-bottom bg-dark " style="background-color: purple" id="span_message">
                 <br>
                 <div class="input-group mb-3">
-                    <input type="text" class="form-control" name="message" maxlength="500" placeholder="Votre message ..." aria-label="message" aria-describedby="basic-addon2">
+                    <input type="text" id="message" class="form-control" name="message" maxlength="500" placeholder="Votre message ..." aria-label="message" aria-describedby="basic-addon2">
                     <div class="input-group-append">
-                        <input class="btn btn-success" type="button" value="Envoyer"/>
+                        <input class="btn btn-success" type="button" id="send_message" onclick="test('tetetetet');" value="Envoyer"/>
                     </div>
                 </div>
             </span>
@@ -155,6 +155,19 @@
         $('#div_messages').animate({
             scrollTop: $('#div_messages').get(0).scrollHeight}, 10);
     });
+
+    function test(text) {
+        var url = '../controllers/c_send_message.php';
+        var message = $("#message").val();
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: { message: message },
+            dataType : 'json'
+        }).done(function(data) {
+            alert( "Data Saved: " + data.return );
+        });
+    }
 </script>
 
 </body>
