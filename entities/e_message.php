@@ -1,6 +1,6 @@
 <?php
 
-class message
+class Message
 {
     private $_sender;
     private $_content;

@@ -1,6 +1,6 @@
 <?php
 
-class user
+class User
 {
     private $_id;
     private $_login;
