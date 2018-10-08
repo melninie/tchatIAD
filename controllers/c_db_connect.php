@@ -13,4 +13,3 @@ function connect()
 
     return $bdd;
 }
-

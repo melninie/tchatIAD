@@ -1,6 +1,6 @@
 <?php
 
-include '../controllers/c_db_connect.php';
+require_once '../controllers/c_db_connect.php';
 $bdd = connect();
 
 /*

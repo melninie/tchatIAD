@@ -1,13 +1,13 @@
 <?php
-    session_start();
-
+//    session_start();
+    require_once '../entities/e_user.php';
+/*
     // Check that a user is 'logged'
     if (empty($_SESSION) || !isset($_SESSION['user']) || empty($_SESSION['user'])) {
         header('location:../index.php');
     }
 
-    require '../entities/e_user.php';
-    require '../entities/e_message.php';
+    require '../entities/e_message.php';*/
 ?>
 
 <html lang="fr">
@@ -71,6 +71,36 @@
                     <div class="row" style="max-height: 100%; overflow-y: scroll;" id="div_messages">
                         <span id="list_messages" class="col-md-12 col-sm-12 col-lg-12 p-3 mb-2 bg-light" style="background-color: yellow">
                             <!-- Display messages -->
+
+                            <?php
+                                if ($res_messages['error']) {
+                                    echo 'Une erreur est survenue durant la récupération des messages.';
+                                }
+                                elseif (count($res_messages['messages']) == 0) {
+                                    echo 'Il n\'y a aucun message à afficher';
+                                }
+
+                                $previous_date = '';
+                                foreach ($res_messages['messages'] as $message) {
+                                    $date_message = $message->getDisplayDate();
+
+                                    // add separation if date of this message is differente from the previous one
+                                    if($previous_date != $date_message) {
+                                        echo '<div class="hr">'.$message->getDisplayDate().'</div>';
+                                        $previous_date = $date_message.'';
+                                    }
+
+                                    // if connected user sent this message
+                                    $classe = "alert alert-secondary";
+                                    if ($message->getSender()->getLogin() == unserialize($_SESSION['user'])->getLogin()) {
+                                        $classe = "alert alert-primary";
+                                    }
+
+                                    // display message
+                                    echo '<div class="'.$classe.'"><b>'.$message->getSender()->getLogin().'</b> '.$message->getDisplayHour().
+                                        ' :<br>'.$message->getContent().'</div>';
+                                }
+                            ?>
                         </span>
 
                     </div>
@@ -88,6 +118,42 @@
             </div>
 
         </div>
+
+        <script type="text/javascript">
+            $( document ).ready(function() {
+                var h1, h2;
+                h1 = $('#span_message').height();
+                h2 = jQuery(window).height();
+                $('#div_membres').height(h2-h1);
+                $('#div_messages').height(h2-h1);
+                $('#div_messages').animate(
+                    {scrollTop: $('#div_messages').get(0).scrollHeight}, 1
+                );
+            });
+
+            // ajax call to send message
+            function send() {
+
+                var url = '../controllers/c_send_message.php';
+                var message = $("#message").val();
+                if (message != undefined && message != '' && message != null) {
+                    $('#send_message').prop("disabled",true); // disable button while send message
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: { message: message },
+                        dataType : 'json'
+                    }).done(function(data) {
+                        $("#message").val(''); // clear input value
+                        $('#send_message').prop("disabled",false); // enable button again
+                    });
+                    location.reload();
+                }
+            }
+        </script>
+
+
+
 
     </body>
 </html>

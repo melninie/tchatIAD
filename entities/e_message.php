@@ -29,4 +29,14 @@ class Message
     {
         return $this->_date;
     }
+
+    public function getDisplayDate()
+    {
+        return $this->_date->format('d/m/Y');
+    }
+
+    public function getDisplayHour()
+    {
+        return $this->_date->format('H:i');
+    }
 }

@@ -2,16 +2,16 @@
 
 session_start();
 
+require_once ('../models/m_message.php');
+require_once ('../entities/e_message.php');
+require_once ('../entities/e_user.php');
+
 // Check that a user is 'logged'
-if (empty($_SESSION) || !isset($_SESSION['login']) || empty($_SESSION['login']) || !isset($_SESSION['id']) || empty($_SESSION['id'])) {
+if (empty($_SESSION) || !isset($_SESSION['user']) || empty($_SESSION['user'])) {
     header('location:../index.php');
 }
 
-include ('../models/m_message.php');
-include ('../entities/e_message.php');
-include ('../entities/e_user.php');
-
-$user = new User($_SESSION['id'], $_SESSION['login']);
+$user = unserialize($_SESSION['user']);
 $message = new Message($user, $_POST['message'], new DateTime());
 
 if (sendMessage($message)) {
