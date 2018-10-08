@@ -1,13 +1,5 @@
 <?php
-//    session_start();
     require_once '../entities/e_user.php';
-/*
-    // Check that a user is 'logged'
-    if (empty($_SESSION) || !isset($_SESSION['user']) || empty($_SESSION['user'])) {
-        header('location:../index.php');
-    }
-
-    require '../entities/e_message.php';*/
 ?>
 
 <html lang="fr">
