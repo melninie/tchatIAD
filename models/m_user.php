@@ -30,18 +30,23 @@ function addUser($login)
 }
 
 /*
- * Get all users in DB
+ * Get all users in DB + dat of last sended message
  */
 function getUsers()
 {
     global $bdd;
-    $req = $bdd->prepare(
-        "SELECT u1.login, date FROM user u1 " .
-        "left join (" .
-            "SELECT u2.login, max(date) as date FROM message left join user u2 on message.sender=u2.id group by sender" .
-        ") t1 on t1.login = u1.login ORDER BY date DESC, login ASC");
-    $req->execute();
-    $results = $req->fetchAll(PDO::FETCH_ASSOC);
-    $req->closeCursor();
-    return ($results);
+    try {
+        $req = $bdd->prepare(
+            "SELECT u1.id, u1.login, date_last_mess FROM user u1 " .
+            "left join (" .
+                "SELECT u2.login, max(date) as date_last_mess FROM message left join user u2 on message.sender=u2.id group by sender" .
+            ") t1 on t1.login = u1.login ORDER BY date_last_mess DESC, login ASC");
+        $req->execute();
+        $results = $req->fetchAll(PDO::FETCH_ASSOC);
+        $req->closeCursor();
+    }
+    catch(Exception $e) {
+        return array("error" => true, "users" => array());
+    }
+    return array("error" => false, "users" => $results);
 }

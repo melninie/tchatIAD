@@ -63,6 +63,46 @@
 
                             <ul id="users" class="list-group">
                                 <!-- Dislay users -->
+                                <?php
+                                    if ($res_users['error']) {
+                                        echo 'Une erreur est survenue durant la récupération des messages.';
+                                    }
+                                    elseif (count($res_users['users']) == 0) {
+                                        echo 'Il n\'y a aucun message à afficher';
+                                    }
+
+                                    foreach ($res_users['users'] as $u) {
+                                        $user = $u['user'];
+
+                                        // if connected user sent this message
+                                        $date_display = '';
+                                        $classe = 'list-group-item  align-items-center';
+                                        if($user->getLogin() == unserialize($_SESSION['user'])->getLogin()) {
+                                            $classe = 'list-group-item list-group-item-action list-group-item-primary';
+                                        }
+
+                                        // if last message date is today, just display hour
+                                        $today = new DateTime();
+                                        $today = $today->format('d/m/Y');
+
+                                        if($u['date_last_message'] != null && $u['date_last_message'] != '' && $u['date_last_message'] != NULL) {
+                                            $last_message = new DateTime($u['date_last_message']);
+                                            $date_last_message = $last_message->format('d/m/Y');
+                                            $hour_last_message = $last_message->format('H:i');
+                                            if($date_last_message == $today) {
+                                                $date_display = 'Dernier message : '.$hour_last_message;
+                                            }
+                                            else {
+                                                $date_display = 'Dernier message : '.last_message.' à '.$hour_last_message;
+                                            }
+                                        }
+
+                                        echo '<li class="'.$classe.'" style="color:black">'.
+                                            $user->getLogin().
+                                            '<br><span class="badge badge-primary badge-pill">'.$date_display.'</span>'.
+                                            '</li>';
+                                    }
+                                ?>
                             </ul>
                         </span>
                     </div>
@@ -71,7 +111,6 @@
                     <div class="row" style="max-height: 100%; overflow-y: scroll;" id="div_messages">
                         <span id="list_messages" class="col-md-12 col-sm-12 col-lg-12 p-3 mb-2 bg-light" style="background-color: yellow">
                             <!-- Display messages -->
-
                             <?php
                                 if ($res_messages['error']) {
                                     echo 'Une erreur est survenue durant la récupération des messages.';
@@ -151,9 +190,5 @@
                 }
             }
         </script>
-
-
-
-
     </body>
 </html>
