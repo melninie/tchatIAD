@@ -1,8 +1,9 @@
 <?php
 
 require_once 'entities/e_message.php';
+require_once 'models/DefaultManager.php';
 
-class MessageManager
+class MessageManager extends DefaultManager
 {
     public function getMessages()
     {
@@ -41,17 +42,5 @@ class MessageManager
         $req->execute($params);
         $req->closeCursor();
         return ($req->rowCount());
-    }
-
-    private function dbConnect()
-    {
-        try
-        {
-            $bdd = new PDO('mysql:host=localhost;dbname=tchat_iad;charset=utf8', 'root', '');
-        }
-        catch (Exception $e)
-        {
-            die('Erreur : ' . $e->getMessage());
-        }        return $bdd;
     }
 }
