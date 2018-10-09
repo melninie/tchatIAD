@@ -1,5 +1,5 @@
 <?php
-    require_once '../entities/e_user.php';
+    require_once '/entities/e_user.php';
 ?>
 
 <html lang="fr">
@@ -48,7 +48,7 @@
                     <div id="div_membres" class="row" style="max-height: 100%; overflow-y: scroll;">
                         <span class="col-md-12 col-sm-12 col-lg-12" style="height: 100%;">
                             <h4>Bienvenue <?php echo unserialize($_SESSION['user'])->getLogin() ?> !</h4>
-                            <a class="btn btn-danger btn-sm" href="../controllers/c_logout.php" role="button">Déconnexion</a>
+                            <a class="btn btn-danger btn-sm" href="index.php?action=logout" role="button">Déconnexion</a>
 
                             <hr color="white">
                             <h3 class="text-center">Membres</h3>
@@ -57,42 +57,43 @@
                                 <!-- Dislay users -->
                                 <?php
                                     if ($res_users['error']) {
-                                        echo 'Une erreur est survenue durant la récupération des messages.';
+                                        echo 'Une erreur est survenue durant la récupération des utilisateurs.';
                                     }
                                     elseif (count($res_users['users']) == 0) {
                                         echo 'Il n\'y a aucun message à afficher';
                                     }
+                                    else {
+                                        foreach ($res_users['users'] as $u) {
+                                            $user = $u['user'];
 
-                                    foreach ($res_users['users'] as $u) {
-                                        $user = $u['user'];
-
-                                        // if connected user sent this message
-                                        $date_display = '';
-                                        $classe = 'list-group-item  align-items-center';
-                                        if($user->getLogin() == unserialize($_SESSION['user'])->getLogin()) {
-                                            $classe = 'list-group-item list-group-item-action list-group-item-primary';
-                                        }
-
-                                        // if last message date is today, just display hour
-                                        $today = new DateTime();
-                                        $today = $today->format('d/m/Y');
-
-                                        if($u['date_last_message'] != null && $u['date_last_message'] != '' && $u['date_last_message'] != NULL) {
-                                            $last_message = new DateTime($u['date_last_message']);
-                                            $date_last_message = $last_message->format('d/m/Y');
-                                            $hour_last_message = $last_message->format('H:i');
-                                            if($date_last_message == $today) {
-                                                $date_display = 'Dernier message : '.$hour_last_message;
+                                            // if connected user sent this message
+                                            $date_display = '';
+                                            $classe = 'list-group-item  align-items-center';
+                                            if($user->getLogin() == unserialize($_SESSION['user'])->getLogin()) {
+                                                $classe = 'list-group-item list-group-item-action list-group-item-primary';
                                             }
-                                            else {
-                                                $date_display = 'Dernier message : '.last_message.' à '.$hour_last_message;
-                                            }
-                                        }
 
-                                        echo '<li class="'.$classe.'" style="color:black">'.
-                                            $user->getLogin().
-                                            '<br><span class="badge badge-primary badge-pill">'.$date_display.'</span>'.
-                                            '</li>';
+                                            // if last message date is today, just display hour
+                                            $today = new DateTime();
+                                            $today = $today->format('d/m/Y');
+
+                                            if($u['date_last_message'] != null && $u['date_last_message'] != '' && $u['date_last_message'] != NULL) {
+                                                $last_message = new DateTime($u['date_last_message']);
+                                                $date_last_message = $last_message->format('d/m/Y');
+                                                $hour_last_message = $last_message->format('H:i');
+                                                if($date_last_message == $today) {
+                                                    $date_display = 'Dernier message : '.$hour_last_message;
+                                                }
+                                                else {
+                                                    $date_display = 'Dernier message : '.$date_last_message.' à '.$hour_last_message;
+                                                }
+                                            }
+
+                                            echo '<li class="'.$classe.'" style="color:black">'.
+                                                $user->getLogin().
+                                                '<br><span class="badge badge-primary badge-pill">'.$date_display.'</span>'.
+                                                '</li>';
+                                        }
                                     }
                                 ?>
                             </ul>
@@ -110,26 +111,27 @@
                                 elseif (count($res_messages['messages']) == 0) {
                                     echo 'Il n\'y a aucun message à afficher';
                                 }
+                                else {
+                                    $previous_date = '';
+                                    foreach ($res_messages['messages'] as $message) {
+                                        $date_message = $message->getDisplayDate();
 
-                                $previous_date = '';
-                                foreach ($res_messages['messages'] as $message) {
-                                    $date_message = $message->getDisplayDate();
+                                        // add separation if date of this message is differente from the previous one
+                                        if($previous_date != $date_message) {
+                                            echo '<div class="hr">'.$message->getDisplayDate().'</div>';
+                                            $previous_date = $date_message.'';
+                                        }
 
-                                    // add separation if date of this message is differente from the previous one
-                                    if($previous_date != $date_message) {
-                                        echo '<div class="hr">'.$message->getDisplayDate().'</div>';
-                                        $previous_date = $date_message.'';
+                                        // if connected user sent this message
+                                        $classe = "alert alert-secondary";
+                                        if ($message->getSender()->getLogin() == unserialize($_SESSION['user'])->getLogin()) {
+                                            $classe = "alert alert-primary";
+                                        }
+
+                                        // display message
+                                        echo '<div class="'.$classe.'"><b>'.$message->getSender()->getLogin().'</b> '.$message->getDisplayHour().
+                                            ' :<br>'.$message->getContent().'</div>';
                                     }
-
-                                    // if connected user sent this message
-                                    $classe = "alert alert-secondary";
-                                    if ($message->getSender()->getLogin() == unserialize($_SESSION['user'])->getLogin()) {
-                                        $classe = "alert alert-primary";
-                                    }
-
-                                    // display message
-                                    echo '<div class="'.$classe.'"><b>'.$message->getSender()->getLogin().'</b> '.$message->getDisplayHour().
-                                        ' :<br>'.$message->getContent().'</div>';
                                 }
                             ?>
                         </span>
@@ -138,12 +140,14 @@
                     <!-- Form for message -->
                     <span class="col-md-12 col-sm-12 col-lg-12 fixed-bottom bg-dark " style="background-color: purple" id="span_message">
                         <br>
-                        <div class="input-group mb-3">
-                            <input type="text" id="message" class="form-control" name="message" maxlength="500" placeholder="Votre message ..." aria-label="message" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <input class="btn btn-success" type="button" id="send_message" onclick="send();" value="Envoyer"/>
+                        <form action="index.php?action=send_message" method="post">
+                            <div class="input-group mb-3">
+                                <input type="text" id="message" class="form-control" name="message" maxlength="500" placeholder="Votre message ..." aria-label="message" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <input class="btn btn-success" type="submit" id="send_message" value="Envoyer"/>
+                                </div>
                             </div>
-                        </div>
+                        </form>
                     </span>
                 </span>
             </div>
@@ -161,26 +165,6 @@
                     {scrollTop: $('#div_messages').get(0).scrollHeight}, 1
                 );
             });
-
-            // ajax call to send message
-            function send() {
-
-                var url = '../controllers/c_send_message.php';
-                var message = $("#message").val();
-                if (message != undefined && message != '' && message != null) {
-                    $('#send_message').prop("disabled",true); // disable button while send message
-                    $.ajax({
-                        type: "POST",
-                        url: url,
-                        data: { message: message },
-                        dataType : 'json'
-                    }).done(function(data) {
-                        $("#message").val(''); // clear input value
-                        $('#send_message').prop("disabled",false); // enable button again
-                    });
-                    location.reload();
-                }
-            }
         </script>
     </body>
 </html>
