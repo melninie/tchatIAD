@@ -8,15 +8,18 @@ require_once ('controllers/UserController.php');
 if (isset($_GET['action'])) {
     switch ($_GET['action']) {
         case "chat":
-            chat();
+            $chatController = new ChatController();
+            $chatController->chat();
             break;
         case "send_message":
             if (!empty($_POST) && isset($_POST['message'])) {
-                sendMessage($_POST['message']);
+                $chatController = new ChatController();
+                $chatController->sendMessage($_POST['message']);
             }
             else {
                 // redirect home page
-                authentication(null);
+                $userController = new UserController();
+                $userController->authentication(null);
             }
             break;
         case "logout":
@@ -24,18 +27,24 @@ if (isset($_GET['action'])) {
             session_unset ();
             session_destroy ();
             // redirect home page
-            authentication(null);
+            $userController = new UserController();
+            $userController->authentication(null);
             break;
         default:
-            authentication(null);
+            $userController = new UserController();
+            $userController->authentication(null);
             break;
     }
 }
 else {
     if (!empty($_POST) && isset($_POST['login'])) {
-        authentication($_POST['login']);
+        // user try to login
+        $userController = new UserController();
+        $userController->authentication($_POST['login']);
     }
     else {
-        authentication(null);
+        // first arrival home page
+        $userController = new UserController();
+        $userController->authentication(null);
     }
 }
